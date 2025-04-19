@@ -1,0 +1,61 @@
+<div   class="m-4">
+  <div
+
+    filter-color="primary"
+  >
+    <div>
+      <div class=" row d-flex justify-content-center ">
+        <div class="col-4 ml-auto mr-auto ">
+          <form
+            (ngSubmit)="onSubmit()"
+            #formLogin="ngForm"
+            class="form"
+            method=""
+            action=""
+          >
+            <div class="card ">
+              <div class="card-body ">
+                <h1 class="card-description text-center ">
+                  Painel administrativo
+                </h1>
+                <p>Esta é uma aplicação de teste, utilize um novo GUID para criar um novo comerciante ou um GUID anterior para utilizar um comerciante já existente</p>
+                <div>
+                  <mat-form-field appearance="outline" class="col-12">
+                    <mat-label>GUID Comerciante</mat-label>
+                    <input 
+                      type="text"
+                      name="comercianteId"
+                      #username="ngModel"
+                      [(ngModel)]="loginRequest!.comercianteId"
+                      required
+                      matInput
+                      placeholder="GUID"
+                      minlength="6"
+                      maxlength="100"
+                    />
+                    <mat-error *ngIf="username.errors?.required"
+                      >Campo obrigatório</mat-error
+                    >
+                    <mat-error *ngIf="username.errors?.pattern"
+                      >Incorreto</mat-error
+                    >
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="card-footer justify-content-center">
+                <button
+                  [disabled]="!formLogin.form.valid || loading"
+                  mat-raised-button
+                  class="btn btn-primary"
+                >
+                  {{ buttonName }}
+                </button>
+              </div>
+
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

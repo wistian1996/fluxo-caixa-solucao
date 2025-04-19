@@ -1,0 +1,89 @@
+version: '3.8'
+services:
+
+  gestor-caixa-front-end:
+    image: gestor-caixa-front-end
+    container_name: gestor-caixa-front-end
+    build:
+      context: ../GestaoCaixaFront/gestor-caixa/
+      dockerfile: Dockerfile
+    ports:
+      - '18083:80'
+    environment:
+      - ENVIRONMENT=staging
+      - API_URL=http://gc_gateway_api:18080
+      
+  gc_gateway_api:
+    image: gestao-fluxo-gateway-api
+    container_name: gc_gateway_api
+    build:
+      context: .
+      # src\ApiGateway\ApiGateway.Ocelot
+      dockerfile: src/ApiGateway/ApiGateway.Ocelot/Dockerfile
+    ports:
+      - '18080:8080'
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Staging
+      - ASPNETCORE_HTTP_PORTS=8080
+      #- ASPNETCORE_HTTPS_PORTS=8081
+
+  gc_gestaofluxo_api:
+    image: gestao-fluxo-api
+    container_name: gc_gestaofluxo_api
+    restart: always
+    build:
+      context: .
+      dockerfile: src/GestaoFluxo/GestaoFluxo.API/Dockerfile
+    ports:
+      - '18081:8081'
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Staging
+      - ASPNETCORE_HTTP_PORTS=8081
+      #- ASPNETCORE_HTTPS_PORTS=8081
+
+  gc_saldoconsolidado_api:
+    image: saldo-consolidado-api
+    container_name: gc_saldoconsolidado_api
+    build:
+      context: .
+      dockerfile: src/SaldoConsolidado/SaldoConsolidado.API/Dockerfile
+    ports:
+      - '18082:8082'
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Staging
+      - ASPNETCORE_HTTP_PORTS=8082
+      #- ASPNETCORE_HTTPS_PORTS=8081
+
+  gc_mysql:
+    image: mysql:8.2.0
+    container_name: gc_mysql
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    ports:
+      - '13306:3306'
+    volumes:
+      - db_data:/var/lib/mysql
+      - "./docker/init-db/gestao-fluxo-init.sql:/docker-entrypoint-initdb.d/1.sql"
+
+  gc_rabbitmq:
+    image: rabbitmq:3-management
+    container_name: gc_rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+  seq:
+    image: datalust/seq:latest
+    container_name: seq
+    environment:
+      - ACCEPT_EULA=Y
+    ports:
+      - 5341:5341
+      - 8081:80
+
+volumes:
+  db_data:
+  rabbitmq_data:

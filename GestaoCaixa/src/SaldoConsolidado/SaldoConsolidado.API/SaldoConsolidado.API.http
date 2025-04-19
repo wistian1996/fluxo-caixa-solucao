@@ -1,0 +1,6 @@
+@SaldoConsolidado.API_HostAddress = http://localhost:5171
+
+GET {{SaldoConsolidado.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

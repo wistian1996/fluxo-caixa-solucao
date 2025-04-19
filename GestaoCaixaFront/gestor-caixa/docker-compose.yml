@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+
+  gestor-caixa-front-end:
+    image: gestor-caixa-front-end
+    container_name: gc_gateway_api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '18083:8083'
+    environment:
+      - ENVIRONMENT=staging
+      - API_URL=http://gc_gateway_api:18080

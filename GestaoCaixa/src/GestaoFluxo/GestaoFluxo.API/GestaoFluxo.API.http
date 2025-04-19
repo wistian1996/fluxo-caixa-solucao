@@ -1,0 +1,6 @@
+@GestaoFluxo.API_HostAddress = http://localhost:5051
+
+GET {{GestaoFluxo.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

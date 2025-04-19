@@ -1,0 +1,27 @@
+{
+    "Routes": [
+        {
+            "UpstreamPathTemplate": "/api/v1/lancamentos/{everything}",
+            "UpstreamHttpMethod": [ "Post", "Get" ],
+            "DownstreamPathTemplate": "/api/v1/lancamentos/{everything}",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 18081
+                }
+            ],
+            "AuthenticationOptions": {
+                "AuthenticationProviderKey": "Bearer",
+                "AllowedScopes": []
+            },
+            "RateLimitOptions": {
+                "ClientWhitelist": [],
+                "EnableRateLimiting": true,
+                "Period": "1m",
+                "PeriodTimespan": 60,
+                "Limit": 10
+            }
+        }
+    ]
+}

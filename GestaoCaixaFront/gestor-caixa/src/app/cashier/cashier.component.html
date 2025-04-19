@@ -1,0 +1,55 @@
+<div style="width: 100vh;">
+  <div class="row " >
+    <div class="col-12 m-4 ">
+      <button mat-flat-button class="m-2 ml-auto" (click)="logout()">Sair da aplicação</button>
+    </div>
+  </div>
+  <div class="m-2 row">
+    <mat-card appearance="outlined" class="m-2">
+      <mat-card-content>
+        <div>
+          <h5 class="p-2">Realizar operação</h5>
+        </div>
+        <div class="col-6">
+          <mat-form-field appearance="outline" class="col-12">
+            <mat-label>Valor</mat-label>
+            <input currencyMask 
+              type="text"
+              name="value"
+              #username="ngModel"
+              [(ngModel)]="value"
+              [options]="{ prefix: 'R$ ', thousands: '.', decimal: ',' }"
+              required
+              matInput
+              placeholder="R$ 0,00"
+              minlength="1"
+              maxlength="10"
+            />
+            <mat-error *ngIf="username.errors?.required"
+              >Campo obrigatório</mat-error
+            >
+            <mat-error *ngIf="username.errors?.pattern"
+              >Incorreto</mat-error
+            >
+          </mat-form-field>
+        </div>
+        <button [disabled]="loading" mat-flat-button class="m-2" (click)="inputCash()">Entrada</button>
+        <button [disabled]="loading" mat-flat-button class="m-2" (click)="outputCash()">Saída</button>
+      </mat-card-content>
+    </mat-card>
+    <mat-card appearance="outlined" class="m-2">
+      <mat-card-content>
+        <div>
+          <h5 class="">Saldo consolidado diário</h5>
+          <p class="">Última tentativa em {{ lastRefresh | date : "dd/MM/yyyy HH:mm:ss" }}</p>
+          <p class="">Última consulta bem sucedida em {{ lastSuccessRefresh | date : "dd/MM/yyyy HH:mm:ss" }}</p>
+  
+          <h1 class="p-2"> {{ (totalBalance|currency:'R$':true:'1.2-2') }}  
+          </h1>
+        </div>
+      
+        <button mat-flat-button [disabled]="loading" class="m-2">Ver relatório completo</button>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

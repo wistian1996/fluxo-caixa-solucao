@@ -1,0 +1,50 @@
+{
+    "Routes": [
+        {
+            "UpstreamPathTemplate": "/api/v1/lancamentos/{everything}",
+            "UpstreamHttpMethod": [ "Post", "Get" ],
+            "DownstreamPathTemplate": "/api/v1/lancamentos/{everything}",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "gc_gestaofluxo_api",
+                    "Port": 8081
+                }
+            ],
+            "AuthenticationOptions": {
+                "AuthenticationProviderKey": "Bearer",
+                "AllowedScopes": []
+            },
+            "RateLimitOptions": {
+                "ClientWhitelist": [],
+                "EnableRateLimiting": true,
+                "Period": "1s",
+                "PeriodTimespan": 1,
+                "Limit": 60
+            }
+        },
+        {
+            "UpstreamPathTemplate": "/api/v1/saldo",
+            "UpstreamHttpMethod": [ "Get" ],
+            "DownstreamPathTemplate": "/api/v1/comerciante/saldo",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "gc_saldoconsolidado_api",
+                    "Port": 8082
+                }
+            ],
+            "AuthenticationOptions": {
+                "AuthenticationProviderKey": "Bearer",
+                "AllowedScopes": []
+            },
+            "RateLimitOptions": {
+                "ClientWhitelist": [],
+                "EnableRateLimiting": true,
+                "Period": "1s",
+                "PeriodTimespan": 1,
+                "Limit": 10
+            }
+        }
+    ]
+}
