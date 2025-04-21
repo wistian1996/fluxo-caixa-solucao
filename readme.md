@@ -12,7 +12,7 @@ Após a instalação do docker, navegue até o diretório GestaoCaixa e execute 
 * docker-compose build
 * docker-compose up
 
-Você pode acompanhar acessar os containers através dos links abaixo.
+Você pode acessar os containers através dos links abaixo.
 
 * Front end http://localhost:18083
 * Gateway http://localhost:18080
