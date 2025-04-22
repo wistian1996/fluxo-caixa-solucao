@@ -118,6 +118,8 @@ Banco de dados relacional MySql.
 11. Net 8
 12. Docker
 13. Docker Compose
+14. Minimal API
+
 
 ## Melhorias Futuras
 
