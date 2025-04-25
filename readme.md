@@ -56,8 +56,9 @@ para verificar a Origem do Token. Assim garantimos que o Token gerado tem a orig
 
 ## Testes de performance
 Utilizei o k6 para testes de performance.
-Para testar navege até a pasta GestaoCaixa/performance-tests.
-Abra o arquivos .js criar-lancamento-test.js, substituia a variavel TOKEN por um token válido
+Para testar navege até a pasta:
+GestaoCaixa/performance-tests
+Abra o arquivos criar-lancamento-test.js, substituia a variavel TOKEN por um token válido gerado pelo gateway
 
 1- Instale o K6 no terminal ubunto, se estiver utilizando windows sugiro abrir um terminal Ubuntu WSL
 . Link para instalação: https://grafana.com/docs/k6/latest/set-up/install-k6/
@@ -124,7 +125,7 @@ Banco de dados relacional MySql.
 ## Melhorias Futuras
 
 * Criação de usuario para usar o rabbit (evitar usar guest)
-* Cofre para salvar credenciais
+* Cofre para salvar credenciais (Retirar credenciais de dentro do projeto)
 * O identity server (responsavel geração de token) está na API Gateway, e normalmente deveria ser um componente separado (keyclock, identityserver4, cognito, ...)
 * Orquestrador de containers
 * Grafana
