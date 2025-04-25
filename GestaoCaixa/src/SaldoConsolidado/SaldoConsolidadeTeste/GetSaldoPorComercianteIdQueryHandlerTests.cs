@@ -19,7 +19,7 @@ namespace SaldoConsolidadeTeste
         }
 
         [Test]
-        public async Task Handle_DeveRetornarSaldoConsolidadoDto_QuandoSaldoExistir()
+        public async Task HandleDeveRetornarSaldoConsolidadoDtoQuandoSaldoExistir()
         {
             var comercianteId = Guid.NewGuid();
             var dataRef = new DateTime(2025, 04, 19);
@@ -45,7 +45,7 @@ namespace SaldoConsolidadeTeste
         }
 
         [Test]
-        public async Task Handle_DeveRetornarNull_QuandoSaldoNaoExistir()
+        public async Task HandleDeveRetornarNullQuandoSaldoNaoExistir()
         {
             var comercianteId = Guid.NewGuid();
             var dataRef = DateTime.UtcNow.Date;

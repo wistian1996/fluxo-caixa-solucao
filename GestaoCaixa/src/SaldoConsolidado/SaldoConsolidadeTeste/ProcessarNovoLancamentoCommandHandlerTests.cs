@@ -12,7 +12,9 @@ namespace SaldoConsolidadeTeste
     {
         private Mock<ISaldoConsolidadoDiarioRepository> _consolidadoDiarioRepoMock;
         private Mock<IEventoLancamentoRepository> _eventoLancamentoRepoMock;
+        private Mock<ISaldoConsolidadoDiarioRepository> _mockSaldoRepo;
         private Mock<IUnitOfWork> _unitOfWorkMock;
+        private Mock<ILogger<ProcessarNovoLancamentoCommandHandler>> _mockLogger;
         private Mock<ILogger<ProcessarNovoLancamentoCommandHandler>> _loggerMock;
         private ProcessarNovoLancamentoCommandHandler _handler;
 
@@ -21,7 +23,10 @@ namespace SaldoConsolidadeTeste
         {
             _consolidadoDiarioRepoMock = new Mock<ISaldoConsolidadoDiarioRepository>();
             _eventoLancamentoRepoMock = new Mock<IEventoLancamentoRepository>();
+            _mockSaldoRepo = new Mock<ISaldoConsolidadoDiarioRepository>();
             _unitOfWorkMock = new Mock<IUnitOfWork>();
+            _mockLogger = new Mock<ILogger<ProcessarNovoLancamentoCommandHandler>>();
+
             _loggerMock = new Mock<ILogger<ProcessarNovoLancamentoCommandHandler>>();
 
             _eventoLancamentoRepoMock.Setup(r => r.UnitOfWork).Returns(_unitOfWorkMock.Object);
@@ -34,9 +39,8 @@ namespace SaldoConsolidadeTeste
         }
 
         [Test]
-        public async Task Handle_DeveProcessarLancamento_ComSucesso()
+        public async Task HandleDeveProcessarLancamentoComSucesso()
         {
-            // Arrange
             var command = new ProcessarNovoLancamentoCommand
             {
                 Id = Guid.NewGuid(),
@@ -46,10 +50,8 @@ namespace SaldoConsolidadeTeste
                 IsCredito = true
             };
 
-            // Act
             var result = await _handler.Handle(command, CancellationToken.None);
 
-            // Assert
             Assert.IsTrue(result);
             _unitOfWorkMock.Verify(u => u.BeginTransaction(), Times.Once);
             _eventoLancamentoRepoMock.Verify(r => r.AddEvento(It.IsAny<EventoLancamento>()), Times.Once);
@@ -59,7 +61,7 @@ namespace SaldoConsolidadeTeste
         }
 
         [Test]
-        public async Task Handle_DeveTratarEventoJaRegistradoException()
+        public async Task HandleDeveTratarEventoJaRegistradoException()
         {
             var command = new ProcessarNovoLancamentoCommand
             {
@@ -89,7 +91,7 @@ namespace SaldoConsolidadeTeste
         }
 
         [Test]
-        public void Handle_DeveLancarException_QuandoErroInesperado()
+        public void HandleDeveLancarExceptionQuandoErroInesperado()
         {
 
             var command = new ProcessarNovoLancamentoCommand
@@ -114,6 +116,80 @@ namespace SaldoConsolidadeTeste
                     LogLevel.Error,
                     It.IsAny<EventId>(),
                     It.Is<It.IsAnyType>((o, t) => o.ToString().Contains("Falha ao processar lançamento")),
+                    It.IsAny<Exception>(),
+                    It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+                Times.Once);
+        }
+
+        [Test]
+        public async Task HandleShouldRollbackAndReturnTrueWhenEventoJaRegistradoExceptionThrown()
+        {
+            // Arrange
+            var command = new ProcessarNovoLancamentoCommand
+            {
+                Id = Guid.NewGuid(),
+                ComercianteId = Guid.NewGuid(),
+                DataCriacao = DateTime.UtcNow,
+                Valor = 150,
+                IsCredito = true
+            };
+
+            _eventoLancamentoRepoMock.Setup(r => r.AddEvento(It.IsAny<EventoLancamento>()))
+                           .ThrowsAsync(new EventoJaRegistradoException("Já registrado"));
+
+            var handler = new ProcessarNovoLancamentoCommandHandler(
+                _mockSaldoRepo.Object,
+                _eventoLancamentoRepoMock.Object,
+                _mockLogger.Object);
+
+            // Act
+            var result = await handler.Handle(command, CancellationToken.None);
+
+            // Assert
+            Assert.IsTrue(result);
+            _unitOfWorkMock.Verify(u => u.Rollback(), Times.Once);
+            _mockLogger.Verify(
+                x => x.Log(
+                    LogLevel.Warning,
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("já processado")),
+                    It.IsAny<Exception>(),
+                    It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+                Times.Once);
+        }
+
+        [Test]
+        public void HandleShouldRollbackAndThrowWhenUnexpectedExceptionOccurs()
+        {
+            // Arrange
+            var command = new ProcessarNovoLancamentoCommand
+            {
+                Id = Guid.NewGuid(),
+                ComercianteId = Guid.NewGuid(),
+                DataCriacao = DateTime.UtcNow,
+                Valor = 200,
+                IsCredito = false
+            };
+
+            _eventoLancamentoRepoMock.Setup(r => r.AddEvento(It.IsAny<EventoLancamento>()))
+                           .ThrowsAsync(new InvalidOperationException("Erro genérico"));
+
+            var handler = new ProcessarNovoLancamentoCommandHandler(
+                _mockSaldoRepo.Object,
+                _eventoLancamentoRepoMock.Object,
+                _mockLogger.Object);
+
+            // Act & Assert
+            var ex = Assert.ThrowsAsync<InvalidOperationException>(() =>
+                handler.Handle(command, CancellationToken.None));
+
+            Assert.That(ex.Message, Is.EqualTo("Erro genérico"));
+            _unitOfWorkMock.Verify(u => u.Rollback(), Times.Once);
+            _mockLogger.Verify(
+                x => x.Log(
+                    LogLevel.Error,
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Falha ao processar")),
                     It.IsAny<Exception>(),
                     It.IsAny<Func<It.IsAnyType, Exception, string>>()),
                 Times.Once);

@@ -46,7 +46,7 @@ namespace GestaFluxoTeste
             }
 
             [Test]
-            public async Task Handle_DeveCriarLancamento_ComSucesso()
+            public async Task HandleDeveCriarLancamentoComSucesso()
             {
                 var command = new CriarLancamentoCommand
                 {
@@ -73,7 +73,7 @@ namespace GestaFluxoTeste
             }
 
             [Test]
-            public void Handle_DeveLancarExcecaoELogarErro_QuandoFalhar()
+            public void HandleDeveLancarExcecaoELogarErroQuandoFalhar()
             {
                 var command = new CriarLancamentoCommand
                 {
